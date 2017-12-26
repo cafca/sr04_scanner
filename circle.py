@@ -3,33 +3,37 @@ import serial
 import time
 import math
 import json
-from time import sleep
 from random import random
 
 
 class Circular(object):
-    def __init__(self, total, rotations, size=(2000, 2000), scale=0.8, steps=5):
+    def __init__(self, total, rotations=0.25, size=(2000, 2000), scale=0.8, steps=3):
         self.size = size
-        self.step = total
+        self.total = total
         self.steps = steps
         self.rotations = rotations
         self.counter = 0
         self.radius = scale * size[0] / 2
         self.img = PIL.Image.new('RGB', size)
         self.pixels = self.img.load()
-        print("Circle size {} with {} steps".format(size, self.step))
-        self.pixels[size[0] / 2, size[1] / 2] = (1, 0, 100)
+        self.set_pixel(size[0] / 2, size[1] / 2)
+
+    def setup(self, rotations, steps):
+        self.rotations = rotations
+        self.steps = steps
+        print("Circle size {} with {} steps".format(self.size, self.steps))
+
+    def set_pixel(self, x, y):
+        self.pixels[x, y] = (255, 255, 255)
+        self.pixels[x + 1, y] = (255, 255, 255)
+        self.pixels[x + 1, y + 1] = (255, 255, 255)
+        self.pixels[x, y + 1] = (255, 255, 255)
 
     def place_point(self, value):
-        def pixel(x, y):
-            self.pixels[x, y] = (255, 255, 255)
-            self.pixels[x + 1, y] = (255, 255, 255)
-            self.pixels[x + 1, y + 1] = (255, 255, 255)
-            self.pixels[x, y + 1] = (255, 255, 255)
 
         # Kreis zeichnen
-        x = self.radius * math.cos(3.14 * -self.counter / self.step * 2.0 * self.rotations)
-        y = self.radius * math.sin(3.14 * -self.counter / self.step * 2.0 * self.rotations)
+        x = self.radius * math.cos(3.14 * self.counter / self.total * 2.0)
+        y = self.radius * math.sin(3.14 * self.counter / self.total * 2.0)
 
         # In die Mitte schieben
         x += self.size[0] / 2
@@ -40,7 +44,7 @@ class Circular(object):
         y = (y * value) + (self.size[1] / 2) * (1.0 - value)
 
         try:
-            pixel(x, y)
+            self.set_pixel(x, y)
         except IndexError:
             print("Tried placing {} {}".format(x, y))
 

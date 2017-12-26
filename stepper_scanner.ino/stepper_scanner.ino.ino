@@ -14,7 +14,7 @@ const float ROTATIONS = 0.5;
 // Wie viele Messungen gemittelt werden sollen
 const int REPEAT_MEASUREMENTS = 1;
 
-const int STEPS_AT_A_TIME = 5;
+const int STEPS_AT_A_TIME = 10;
 
 // defines pins numbers
 const int TRIG_PIN = 7;
@@ -24,18 +24,20 @@ Stepper myStepper(STEPS_PER_REVOLUTION, 8, 10, 9, 11);
 
 // defines variables
 float distance;
+float measurement;
 float timings;
 int stepCount;
 bool done;
 
 void setup() {
-  myStepper.setSpeed(10);
-
+  myStepper.setSpeed(5);
   pinMode(TRIG_PIN, OUTPUT); // Sets the TRIG_PIN as an Output
   pinMode(ECHO_PIN, INPUT); // Sets the ECHO_PIN as an Input
 
   Serial.begin(9600); // Starts the serial communication
-  Serial.println("[");
+  Serial.println("OK");
+  Serial.println(ROTATIONS);
+  Serial.println(STEPS_AT_A_TIME);
 
   stepCount = 0;
   done = false;
@@ -66,9 +68,10 @@ float measure() {
 }
 
 void loop() {
+
   if (stepCount < (ROTATIONS * STEPS_PER_REVOLUTION)) {
     // Messen, bis STEPS_PER_REVOLUTION erreich wurde
-    float measurement = measure();
+    measurement = measure();
     if (measurement < 400.0) {
       Serial.println(measurement);
     } else {
@@ -82,7 +85,7 @@ void loop() {
     myStepper.setSpeed(10);
     myStepper.step(-1.0 * int(ROTATIONS * STEPS_PER_REVOLUTION));
     done = true;
-    Serial.println("]");
+    Serial.println("DONE");
   }
 }
 
